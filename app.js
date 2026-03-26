@@ -1,5 +1,6 @@
 const { useState, useRef, useEffect } = React;
 
+// إعدادات المفتاح والرابط المستقر
 const API_KEY = "AIzaSyDVJPw5sgJM8FV_FQMlDMIqgXwUwaMNkZo";
 const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
 
@@ -25,18 +26,19 @@ function fileToBase64(file) {
   });
 }
 
+// دالة الاتصال المصلحة 100%
 async function callAPI(parts) {
   var response = await fetch(API_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      contents: [{ parts: parts }],
-      generationConfig: { temperature: 0.8, maxOutputTokens: 2048 }
+      contents: [{ parts: parts }]
     })
   });
+  
   var data = await response.json();
   if (!response.ok) {
-    throw new Error(data.error ? data.error.message : "خطأ في الاتصال");
+    throw new Error(data.error ? data.error.message : "خطأ في الاتصال بالسيرفر");
   }
   return data.candidates[0].content.parts[0].text;
 }
@@ -132,7 +134,6 @@ function App() {
   function onKey(e) { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }
 
   return React.createElement("div", { style: { height: "100vh", display: "flex", flexDirection: "column", overflow: "hidden" } },
-
     React.createElement("header", { className: "header-bar", style: { padding: "10px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 } },
       React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 12 } },
         React.createElement("div", { style: { position: "relative", overflow: "hidden", width: 42, height: 42, borderRadius: 11, background: "linear-gradient(135deg,rgba(0,245,255,0.2),rgba(191,0,255,0.3))", border: "1px solid rgba(0,245,255,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 } },
@@ -152,9 +153,7 @@ function App() {
         React.createElement("span", { style: { fontSize: 11, color: "#00ff88", fontWeight: 700 } }, "LIVE")
       )
     ),
-
     React.createElement("div", { style: { flex: 1, display: "flex", overflow: "hidden", padding: 14, gap: 14 } },
-
       React.createElement("div", { className: "desktop-only", style: { width: 300, flexShrink: 0, display: "flex", flexDirection: "column" } },
         React.createElement("div", { className: "panel", style: { padding: 18, display: "flex", flexDirection: "column", gap: 14, height: "100%" } },
           React.createElement("div", { style: { fontWeight: 700, fontSize: 14 } }, "🎬 رفع الفيديو / الصورة"),
@@ -176,69 +175,40 @@ function App() {
               : React.createElement("div", { style: { textAlign: "center" } },
                   React.createElement("div", { style: { fontSize: 46, filter: "drop-shadow(0 0 16px rgba(0,245,255,0.5))" } }, "📁"),
                   React.createElement("div", { style: { fontWeight: 700, fontSize: 13, color: "var(--cyan)", marginTop: 8 } }, "اسحب الملف هنا"),
-                  React.createElement("div", { style: { fontSize: 11, color: "var(--muted)", marginTop: 4 } }, "أو اضغط للاختيار"),
-                  React.createElement("div", { style: { fontSize: 10, color: "var(--muted)", marginTop: 6 } }, "MP4 · PNG · JPG · MOV")
+                  React.createElement("div", { style: { fontSize: 11, color: "var(--muted)", marginTop: 4 } }, "أو اضغط للاختيار")
                 )
           ),
           React.createElement("input", { ref: fileRef, type: "file", accept: "video/*,image/*", style: { display: "none" }, onChange: function(e) { pickFile(e.target.files[0]); } }),
-          file && React.createElement("button", { className: "btn-neon", style: { padding: "7px", borderRadius: 9, fontSize: 12 }, onClick: function() { setFile(null); } }, "✕ حذف المرفق"),
-          React.createElement("div", { style: { background: "rgba(191,0,255,0.06)", border: "1px solid rgba(191,0,255,0.2)", borderRadius: 10, padding: 12 } },
-            React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#a78bfa", marginBottom: 7 } }, "💡 أسئلة مقترحة"),
-            ["هل هذا فانك إيدت؟", "وين أضيف SFX؟", "إيش الكليبات الممله؟", "كيف أحسن البيسينج؟"].map(function(q, i) {
-              return React.createElement("div", { key: i, style: { fontSize: 11, color: "var(--muted)", marginBottom: 3 } }, "▸ " + q);
-            })
-          )
+          file && React.createElement("button", { className: "btn-neon", style: { padding: "7px", borderRadius: 9, fontSize: 12 }, onClick: function() { setFile(null); } }, "✕ حذف المرفق")
         )
       ),
-
       React.createElement("div", { className: "panel", style: { flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" } },
-
         React.createElement("div", { style: { padding: "12px 18px", borderBottom: "1px solid var(--border)", flexShrink: 0, display: "flex", alignItems: "center", gap: 10 } },
           React.createElement("span", { style: { fontSize: 18 } }, "💬"),
           React.createElement("div", null,
-            React.createElement("div", { style: { fontWeight: 700, fontSize: 14 } }, "غرفة التحليل"),
-            React.createElement("div", { style: { fontSize: 11, color: "var(--muted)" } }, (msgs.length - 1) + " رسالة")
+            React.createElement("div", { style: { fontWeight: 700, fontSize: 14 } }, "غرفة التحليل")
           )
         ),
-
         React.createElement("div", { style: { flex: 1, overflowY: "auto", padding: 18, display: "flex", flexDirection: "column", gap: 18 } },
           msgs.map(function(m, i) { return React.createElement(Bubble, { key: i, msg: m }); }),
           loading && React.createElement(Dots),
           React.createElement("div", { ref: endRef })
         ),
-
-        file && React.createElement("div", { className: "mobile-only", style: { padding: "0 14px 8px" } },
-          React.createElement("div", { className: "file-badge", style: { padding: "7px 12px", display: "flex", alignItems: "center", justifyContent: "space-between" } },
-            React.createElement("span", { style: { fontSize: 12, color: "var(--cyan)" } }, (file.isImage ? "🖼️ " : "🎬 ") + file.name.slice(0, 28)),
-            React.createElement("button", { onClick: function() { setFile(null); }, style: { background: "none", border: "none", color: "var(--muted)", cursor: "pointer", fontSize: 15 } }, "✕")
-          )
-        ),
-
-        React.createElement("div", { style: { padding: "12px 14px", borderTop: "1px solid var(--border)", display: "flex", gap: 9, alignItems: "flex-end", flexShrink: 0, background: "rgba(0,0,0,0.2)" } },
-          React.createElement("label", { className: "mobile-only", style: { width: 40, height: 40, borderRadius: 9, flexShrink: 0, background: "rgba(0,245,255,0.08)", border: "1px solid rgba(0,245,255,0.25)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 17 } },
-            "📎",
-            React.createElement("input", { type: "file", accept: "video/*,image/*", style: { display: "none" }, onChange: function(e) { pickFile(e.target.files[0]); } })
-          ),
+        React.createElement("div", { style: { padding: "12px 14px", borderTop: "1px solid var(--border)", display: "flex", gap: 9, alignItems: "flex-end", flexShrink: 0 } },
           React.createElement("textarea", {
             className: "chat-input",
             value: txt,
             onChange: function(e) { setTxt(e.target.value); },
             onKeyDown: onKey,
             placeholder: "اسأل AI Edit Director...",
-            rows: 1,
-            style: { padding: "10px 13px", maxHeight: 110, overflowY: "auto" },
-            onInput: function(e) { e.target.style.height = "auto"; e.target.style.height = Math.min(e.target.scrollHeight, 110) + "px"; }
+            rows: 1
           }),
           React.createElement("button", {
             className: "btn-send",
             onClick: send,
             disabled: loading || (!txt.trim() && !file),
-            style: { width: 40, height: 40, borderRadius: 9, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17 }
-          },
-            loading
-              ? React.createElement("div", { style: { width: 16, height: 16, borderRadius: "50%", border: "2px solid rgba(0,0,0,0.3)", borderTopColor: "#000", animation: "spin 0.7s linear infinite" } })
-              : "⚡"
-          )
+            style: { width: 40, height: 40, borderRadius: 9, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }
+          }, loading ? "..." : "⚡")
         )
       )
     )
@@ -246,3 +216,4 @@ function App() {
 }
 
 ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
+
